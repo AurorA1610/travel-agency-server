@@ -36,6 +36,11 @@ async function run () {
             const bookings = await cursor.toArray();
             res.send(bookings);
         });
+        app.get('/allbookings', async(req, res) => {
+            const cursor = bookingsCollection.find({});
+            const bookings = await cursor.toArray();
+            res.send(bookings);
+        });
 
         // Get Single Package API
         app.get('/packages/:id', async(req, res) => {
@@ -43,6 +48,15 @@ async function run () {
             const query = { _id: ObjectId(id) };
             const singlePackage = await packagesCollection.findOne(query);
             res.json(singlePackage);
+        });
+
+        // Insert a New Package API
+        app.post('/packages', async(req, res) => {
+            const newPackage = req.body;
+            const result = await packagesCollection.insertOne(newPackage);
+            console.log('hitting', req.body);
+            console.log(`A document was inserted with the _id: ${result.insertedId}`);
+            res.json(result);
         });
 
         // Insert a Booking API
@@ -56,6 +70,14 @@ async function run () {
 
         // Delete a Booking API
         app.delete('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await bookingsCollection.deleteOne(query);
+            console.log('deleting id', result);
+            res.json(result);
+        });
+        // Delete a Booking API
+        app.delete('/allbookings/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await bookingsCollection.deleteOne(query);
